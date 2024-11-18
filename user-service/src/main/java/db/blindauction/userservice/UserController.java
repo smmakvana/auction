@@ -18,7 +18,7 @@ public class UserController {
 
     @GetMapping("{token}")
     public ResponseEntity<User> getUser(@PathVariable String token){
-        return userService.getUser(token).map(ResponseEntity::ok).orElse(ResponseEntity.status(404).body(null));
+        return userService.getUser(token).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
 }
