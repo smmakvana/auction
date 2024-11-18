@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:hsqldb:mem:testdb  # In-memory database
+    driverClassName: org.hsqldb.jdbc.JDBCDriver
+    username: sa
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
