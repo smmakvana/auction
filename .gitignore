@@ -1,0 +1,12 @@
+# IntelliJ IDEA project files
+/.idea/
+
+# Ignore all target directories across all modules build output directories
+*/target/
+
+# Ignore all .log files across the project
+*.log
+
+# Ignore all .tmp files across the project
+*.tmp
+
