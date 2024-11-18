@@ -1,4 +1,4 @@
-package db.blindauction.userservice;
+package db.blindauction.userservice.controller;
 
 import db.blindauction.userservice.model.User;
 import db.blindauction.userservice.sevice.UserService;
