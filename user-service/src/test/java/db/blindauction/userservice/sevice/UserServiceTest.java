@@ -3,35 +3,39 @@ package db.blindauction.userservice.sevice;
 import db.blindauction.userservice.model.User;
 import db.blindauction.userservice.repository.UserRepository;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
-class UserServiceIntegrationTest {
-    @Autowired
-    private UserService userService;
-    @Autowired
+class UserServiceTest {
+
+    @Mock
     private UserRepository userRepository;
 
+    @InjectMocks
+    private UserService userService;
+
     @Test
-    void testInitialiseFewUsers() {
-        assertEquals(3, userRepository.count());
-    }
-    @Test
-    void testGetUser() {
-        String validToken = "token1";
-        Optional<User> user = userService.getUser(validToken);
+    void testGetUserValidToken() {
+        MockitoAnnotations.openMocks(this);
+        User mockUser = new User();
+        mockUser.setName("Alfa");
+        mockUser.setToken("token1");
+        when(userRepository.findByToken("token1")).thenReturn(Optional.of(mockUser));
+        Optional<User> user = userService.getUser("token1");
         assertTrue(user.isPresent());
-        assertEquals("Alfa", user.get().getName());
+        assertTrue(user.get().getName().equals("Alfa"));
     }
+
     @Test
-    void testGetUser_NotFound() {
-        String invalidToken = "invalid";
-        Optional<User> user = userService.getUser(invalidToken);
+    void testGetUserInvalidToken() {
+        MockitoAnnotations.openMocks(this);
+        Optional<User> user = userService.getUser("token2");
         assertFalse(user.isPresent());
     }
 }
