@@ -7,6 +7,7 @@ import db.blindauction.auctionservice.repository.AuctionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -74,7 +75,7 @@ public class AuctionService {
         // Get the highest bid
         Bid winningBid = auction.getBids()
                 .stream()
-                .max((bid1, bid2) -> Double.compare(bid1.getAmount(), bid2.getAmount()))
+                .max(Comparator.comparingDouble(Bid::getAmount))
                 .orElseThrow(() -> new AuctionException("Unable to determine the winning bid"));
 
         // Close the auction
