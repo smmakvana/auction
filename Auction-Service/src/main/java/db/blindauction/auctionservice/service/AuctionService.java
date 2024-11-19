@@ -1,6 +1,6 @@
 package db.blindauction.auctionservice.service;
 
-
+import db.blindauction.auctionservice.exception.AuctionException;
 import db.blindauction.auctionservice.model.Auction;
 import db.blindauction.auctionservice.model.Bid;
 import db.blindauction.auctionservice.repository.AuctionRepository;
@@ -28,7 +28,7 @@ public class AuctionService {
     }
 
     /**
-     * List all active auctions.
+     * List all auctions.
      */
     public List<Auction> getAllAuctions() {
         return auctionRepository.findAll();
@@ -39,14 +39,14 @@ public class AuctionService {
      */
     public void placeBid(Long auctionId, String buyerToken, double amount) {
         Auction auction = auctionRepository.findById(auctionId)
-                .orElseThrow(() -> new IllegalArgumentException("Auction not found with ID: " + auctionId));
+                .orElseThrow(() -> new AuctionException("Auction not found with ID: " + auctionId));
 
         if (!auction.isActive()) {
-            throw new IllegalArgumentException("Auction is no longer active!");
+            throw new AuctionException("Auction is no longer active!");
         }
 
         if (amount < auction.getMinimumBid()) {
-            throw new IllegalArgumentException("Bid amount is less than the minimum bid!");
+            throw new AuctionException("Bid amount is less than the minimum bid!");
         }
 
         Bid bid = new Bid();
@@ -61,21 +61,21 @@ public class AuctionService {
      */
     public Bid endAuction(Long auctionId) {
         Auction auction = auctionRepository.findById(auctionId)
-                .orElseThrow(() -> new IllegalArgumentException("Auction not found with ID: " + auctionId));
+                .orElseThrow(() -> new AuctionException("Auction not found with ID: " + auctionId));
 
         if (!auction.isActive()) {
-            throw new IllegalArgumentException("Auction is already closed!");
+            throw new AuctionException("Auction is already closed!");
         }
 
         if (auction.getBids().isEmpty()) {
-            throw new IllegalArgumentException("No bids found for this auction!");
+            throw new AuctionException("No bids found for this auction!");
         }
 
         // Get the highest bid
         Bid winningBid = auction.getBids()
                 .stream()
                 .max((bid1, bid2) -> Double.compare(bid1.getAmount(), bid2.getAmount()))
-                .orElseThrow(() -> new IllegalArgumentException("Unable to determine the winning bid"));
+                .orElseThrow(() -> new AuctionException("Unable to determine the winning bid"));
 
         // Close the auction
         auction.setActive(false);
