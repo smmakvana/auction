@@ -51,11 +51,11 @@ class AuctionServiceTest {
         List<Auction> auctions = new ArrayList<>();
         auctions.add(new Auction());
         auctions.add(new Auction());
-        when(auctionRepository.findAll()).thenReturn(auctions);
+        when(auctionRepository.findByIsActiveTrue()).thenReturn(auctions);
         List<Auction> result = auctionService.getActiveAuctions();
         assertNotNull(result);
         assertEquals(2, result.size());
-        verify(auctionRepository, times(1)).findAll();
+        verify(auctionRepository, times(1)).findByIsActiveTrue();
     }
 
     @Test

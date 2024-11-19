@@ -1,16 +1,18 @@
 package db.blindauction.auctionservice.controller;
 
-
+import db.blindauction.auctionservice.client.UserServiceClient;
 import db.blindauction.auctionservice.model.Auction;
 import db.blindauction.auctionservice.repository.AuctionRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class AuctionControllerIntegrationTest {
@@ -21,10 +23,16 @@ class AuctionControllerIntegrationTest {
     @Autowired
     private AuctionRepository auctionRepository;
 
+    @MockBean
+    private UserServiceClient userServiceClient; // Mock the UserServiceClient
+
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Test
     void testRegisterAuctionIntegration() {
+        // Mock the UserServiceClient response
+        when(userServiceClient.isValidToken("token123")).thenReturn(true);
+
         String url = "http://localhost:" + port + "/api/auctions?sellerToken=token123&description=Sample Auction&minimumBid=100.0";
 
         ResponseEntity<Auction> response = restTemplate.postForEntity(url, null, Auction.class);
@@ -32,8 +40,10 @@ class AuctionControllerIntegrationTest {
         assertNotNull(response.getBody());
         assertEquals("token123", response.getBody().getSellerToken());
         assertEquals("Sample Auction", response.getBody().getDescription());
-        // Use a small delta value (0.0001) to allow for precision differences
-        assertEquals(100.0, response.getBody().getMinimumBid(),0.0001);
+        assertEquals(100.0, response.getBody().getMinimumBid(), 0.0001);
+
+        // Verify UserServiceClient was called
+        verify(userServiceClient, times(1)).isValidToken("token123");
     }
 
     @Test

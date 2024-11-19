@@ -1,5 +1,6 @@
 package db.blindauction.auctionservice.controller;
 
+import db.blindauction.auctionservice.client.UserServiceClient;
 import db.blindauction.auctionservice.model.Auction;
 import db.blindauction.auctionservice.model.Bid;
 import db.blindauction.auctionservice.service.AuctionService;
@@ -26,6 +27,9 @@ class AuctionControllerTest {
     @MockBean
     private AuctionService auctionService;
 
+    @MockBean
+    private UserServiceClient userServiceClient;
+
     @Test
     void testRegisterAuction() throws Exception {
         Auction auction = new Auction();
@@ -35,6 +39,7 @@ class AuctionControllerTest {
         auction.setMinimumBid(100.0);
         auction.setActive(true);
 
+        when(userServiceClient.isValidToken("token123")).thenReturn(true);
         when(auctionService.registerAuction(anyString(), anyString(), anyDouble())).thenReturn(auction);
 
         mockMvc.perform(post("/api/auctions")
@@ -44,9 +49,11 @@ class AuctionControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.description").value("Sample Auction"));
+                .andExpect(jsonPath("$.description").value("Sample Auction"))
+                .andExpect(jsonPath("$.sellerToken").value("token123"))
+                .andExpect(jsonPath("$.minimumBid").value(100.0))
+                .andExpect(jsonPath("$.active").value(true));
     }
-
 
     @Test
     void testGetActiveAuctions() throws Exception {
@@ -62,9 +69,11 @@ class AuctionControllerTest {
         mockMvc.perform(get("/api/auctions/active"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1L))
-                .andExpect(jsonPath("$[0].description").value("Active Auction"));
+                .andExpect(jsonPath("$[0].description").value("Active Auction"))
+                .andExpect(jsonPath("$[0].sellerToken").value("token123"))
+                .andExpect(jsonPath("$[0].minimumBid").value(100.0))
+                .andExpect(jsonPath("$[0].active").value(true));
     }
-
 
     @Test
     void testPlaceBid() throws Exception {
@@ -80,14 +89,12 @@ class AuctionControllerTest {
 
     @Test
     void testEndAuction() throws Exception {
-        // Create a bid and set its values
         Bid winningBid = new Bid();
         winningBid.setBuyerToken("buyer123");
         winningBid.setAmount(200.0);
-        // Mock the auction service to return the winning bid
+
         when(auctionService.endAuction(1L)).thenReturn(winningBid);
 
-        // Perform the end auction API call and verify the response
         mockMvc.perform(post("/api/auctions/1/end"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.buyerToken").value("buyer123"))
