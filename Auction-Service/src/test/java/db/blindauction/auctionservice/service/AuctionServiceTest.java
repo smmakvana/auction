@@ -47,12 +47,12 @@ class AuctionServiceTest {
     }
 
     @Test
-    void getAllAuctions_shouldReturnAllAuctions() {
+    void getAllAuctions_shouldReturnActiveAuctions() {
         List<Auction> auctions = new ArrayList<>();
         auctions.add(new Auction());
         auctions.add(new Auction());
         when(auctionRepository.findAll()).thenReturn(auctions);
-        List<Auction> result = auctionService.getAllAuctions();
+        List<Auction> result = auctionService.getActiveAuctions();
         assertNotNull(result);
         assertEquals(2, result.size());
         verify(auctionRepository, times(1)).findAll();

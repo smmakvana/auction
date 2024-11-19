@@ -57,7 +57,7 @@ class AuctionControllerTest {
         auction.setMinimumBid(100.0);
         auction.setActive(true);
 
-        when(auctionService.getAllAuctions()).thenReturn(Collections.singletonList(auction));
+        when(auctionService.getActiveAuctions()).thenReturn(Collections.singletonList(auction));
 
         mockMvc.perform(get("/api/auctions/active"))
                 .andExpect(status().isOk())

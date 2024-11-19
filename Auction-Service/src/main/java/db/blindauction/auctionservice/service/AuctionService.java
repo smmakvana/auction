@@ -4,7 +4,6 @@ import db.blindauction.auctionservice.exception.AuctionException;
 import db.blindauction.auctionservice.model.Auction;
 import db.blindauction.auctionservice.model.Bid;
 import db.blindauction.auctionservice.repository.AuctionRepository;
-import db.blindauction.auctionservice.repository.BidRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +35,7 @@ public class AuctionService {
      * List all auctions.
      */
     @Transactional(readOnly = true)
-    public List<Auction> getAllAuctions() {
+    public List<Auction> getActiveAuctions() {
         return auctionRepository.findByIsActiveTrue();
     }
 
