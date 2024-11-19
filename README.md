@@ -32,13 +32,13 @@ Create a prototype of a platform for running blind  auctions
       curl -X POST http://localhost:8081/api/users/token4 // will return error response
       ```
 
-    - **Create Auction (by `user1`):**
+    - **Create Auction (by `Alfa`):**
       ```bash
       curl -X POST "http://localhost:8081/api/auctions?description=Sample+Auction1&sellerToken=token1&minimumBid=100.0"
-      curl -X POST "http://localhost:8081/api/auctions?description=Sample+Auction2&sellerToken=token1&minimumBid=100.0"
+      curl -X POST "http://localhost:8081/api/auctions?description=Sample+Auction2&sellerToken=token1&minimumBid=200.0"
       ```
 
-    - **Place Bid (by `user2` and `user3`):**
+    - **Place Bid (by `Beta` and `Gemma`):**
       ```bash
       curl -X POST "http://localhost:8081/api/auctions/1/bid?buyerToken=token2&amount=150.0"
       curl -X POST "http://localhost:8081/api/auctions/1/bid?buyerToken=token3&amount=200.0"
