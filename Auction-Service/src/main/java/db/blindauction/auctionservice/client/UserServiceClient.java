@@ -11,7 +11,7 @@ public class UserServiceClient {
     private RestTemplate restTemplate;
 
     public boolean isValidToken(String token) {
-        String url = "http://localhost:8081/api/users/" + token;
+        String url = "http://localhost:8080/api/users/" + token;
         try {
             UserDto userDto = restTemplate.getForObject(url, UserDto.class);
             return userDto.getToken().compareTo(token)==0;

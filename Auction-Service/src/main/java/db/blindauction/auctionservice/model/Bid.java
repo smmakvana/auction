@@ -1,9 +1,10 @@
 package db.blindauction.auctionservice.model;
 
+
+
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-
 @Entity
 public class Bid {
     @Id
@@ -13,9 +14,7 @@ public class Bid {
     private String buyerToken;
     private LocalDateTime timestamp;
 
-    @ManyToOne
-    private Auction auction;
-
+    // Getters and setters
     public Long getId() {
         return id;
     }
@@ -46,13 +45,5 @@ public class Bid {
 
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
-    }
-
-    public Auction getAuction() {
-        return auction;
-    }
-
-    public void setAuction(Auction auction) {
-        this.auction = auction;
     }
 }

@@ -1,5 +1,6 @@
 package db.blindauction.auctionservice.controller;
 
+import db.blindauction.auctionservice.client.UserServiceClient;
 import db.blindauction.auctionservice.model.Auction;
 import db.blindauction.auctionservice.model.Bid;
 import db.blindauction.auctionservice.service.AuctionService;
@@ -16,14 +17,25 @@ public class AuctionController {
     @Autowired
     private AuctionService auctionService;
 
+    @Autowired
+    private UserServiceClient userServiceClient;
+
     /**
      * Register a new auction with the seller token, description, and minimum bid.
      */
     @PostMapping
-    public ResponseEntity<Auction> registerAuction(
+    public ResponseEntity<?> registerAuction(
             @RequestParam String sellerToken,
             @RequestParam String description,
             @RequestParam double minimumBid) {
+        // Validate seller token
+        if (!userServiceClient.isValidToken(sellerToken)) {
+            return ResponseEntity.badRequest().body("Invalid seller token.");
+        }
+        // Validate minimum bid
+        if (minimumBid < 0) {
+            return ResponseEntity.badRequest().body("Minimum bid must be non-negative.");
+        }
         Auction auction = auctionService.registerAuction(sellerToken, description, minimumBid);
         return ResponseEntity.ok(auction);
     }
@@ -33,7 +45,7 @@ public class AuctionController {
      */
     @GetMapping("/active")
     public ResponseEntity<List<Auction>> getActiveAuctions() {
-        List<Auction> activeAuctions = auctionService.getAllAuctions();
+        List<Auction> activeAuctions = auctionService.getActiveAuctions();
         return ResponseEntity.ok(activeAuctions);
     }
 
@@ -45,7 +57,13 @@ public class AuctionController {
             @PathVariable Long auctionId,
             @RequestParam String buyerToken,
             @RequestParam double amount) {
-        auctionService.placeBid(auctionId, buyerToken, amount);
+        // Place bid
+        try {
+            auctionService.placeBid(auctionId, buyerToken, amount);
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+
         return ResponseEntity.ok("Bid placed successfully");
     }
 
@@ -53,8 +71,12 @@ public class AuctionController {
      * End an auction and determine the winner.
      */
     @PostMapping("/{auctionId}/end")
-    public ResponseEntity<Bid> endAuction(@PathVariable Long auctionId) {
-        Bid winningBid = auctionService.endAuction(auctionId);
-        return ResponseEntity.ok(winningBid);
+    public ResponseEntity<?> endAuction(@PathVariable Long auctionId) {
+        try {
+            Bid winningBid = auctionService.endAuction(auctionId);
+            return ResponseEntity.ok(winningBid);
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
     }
 }

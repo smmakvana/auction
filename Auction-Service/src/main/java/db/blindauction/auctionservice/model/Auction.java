@@ -4,20 +4,22 @@ import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
-
 @Entity
 public class Auction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String description;
     private String sellerToken;
     private double minimumBid;
     private boolean isActive = true;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "auction")
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "auction_id") // Unidirectional relationship, this column will be in the `Bid` table
     private List<Bid> bids = new ArrayList<>();
 
+    // Getters and setters
     public Long getId() {
         return id;
     }
@@ -64,5 +66,9 @@ public class Auction {
 
     public void setBids(List<Bid> bids) {
         this.bids = bids;
+    }
+
+    public void addBid(Bid bid) {
+        this.bids.add(bid);
     }
 }

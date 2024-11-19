@@ -4,9 +4,12 @@ import db.blindauction.auctionservice.exception.AuctionException;
 import db.blindauction.auctionservice.model.Auction;
 import db.blindauction.auctionservice.model.Bid;
 import db.blindauction.auctionservice.repository.AuctionRepository;
+import db.blindauction.auctionservice.repository.BidRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 
@@ -19,6 +22,7 @@ public class AuctionService {
     /**
      * Register a new auction with a seller, product, and minimum bid.
      */
+    @Transactional
     public Auction registerAuction(String sellerToken, String description, double minimumBid) {
         Auction auction = new Auction();
         auction.setSellerToken(sellerToken);
@@ -31,13 +35,12 @@ public class AuctionService {
     /**
      * List all auctions.
      */
+    @Transactional(readOnly = true)
     public List<Auction> getAllAuctions() {
-        return auctionRepository.findAll();
+        return auctionRepository.findByIsActiveTrue();
     }
 
-    /**
-     * Place a bid for a specific auction.
-     */
+
     public void placeBid(Long auctionId, String buyerToken, double amount) {
         Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(() -> new AuctionException("Auction not found with ID: " + auctionId));
@@ -53,13 +56,21 @@ public class AuctionService {
         Bid bid = new Bid();
         bid.setBuyerToken(buyerToken);
         bid.setAmount(amount);
+        bid.setTimestamp(LocalDateTime.now());
+
+        // Add the bid to the auction's bid list
         auction.getBids().add(bid);
+
+        // Save the auction (cascading will persist the bid)
         auctionRepository.save(auction);
     }
+
+
 
     /**
      * End the auction and determine the winner.
      */
+    @Transactional
     public Bid endAuction(Long auctionId) {
         Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(() -> new AuctionException("Auction not found with ID: " + auctionId));
