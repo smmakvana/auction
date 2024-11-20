@@ -28,9 +28,6 @@ curl http://localhost:8081/api/auctions/active
 echo Ending Auction and Retrieving Winning Bid...
 curl -X POST http://localhost:8081/api/auctions/1/end
 
-echo Listing Active Auctions...
-curl http://localhost:8081/api/auctions/active
-
 echo Auction Test Completed!
 echo Please check the output in the respective services for more details.
 pause
