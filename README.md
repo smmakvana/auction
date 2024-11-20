@@ -1,7 +1,3 @@
-Here’s the updated version of your documentation to include instructions for running all cURL commands on Windows using a `run_auction.bat` file:
-
----
-
 # Auction Test
 Create a prototype of a platform for running blind auctions.
 
